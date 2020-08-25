@@ -84,3 +84,23 @@ typecast.array = function (val) {
 typecast.boolean = function (val) {
   return !! val && val !== 'false' && val !== '0';
 };
+
+/**
+ * Cast `val` to `Object`
+ *
+ * @param {Mixed} val
+ * @api public
+ */
+typecast.object = function(val) {
+  if (val == null) return {};
+  if (Array.isArray(val)) return Object.assign({}, val);
+  if (val instanceof Object) return val;
+  if (typeof val !== 'string') return { value: val };
+  let obj = {};
+  try {
+	  obj = JSON.parse(val);
+  } catch (error) {
+	  obj = { value: val };
+  }
+  return obj;
+};

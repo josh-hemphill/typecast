@@ -30,7 +30,7 @@ describe('.number()', function () {
 
 describe('.date()', function () {
   it('should return a date', function () {
-    assert(typecast.date('2010 10 01').valueOf() === 1285884000000);
+    assert(typecast.date('2010 10 01').valueOf() === 1285905600000);
   })
 
   it('should return default date if typecasting fails', function () {
@@ -78,6 +78,46 @@ describe('.boolean()', function () {
     assert(typecast.boolean(0) === false);
     assert(typecast.boolean('0') === false);
     assert(typecast.boolean('false') === false);
+  })
+})
+
+describe('.object()', function () {
+  it('should return an object', function () {
+	  var obj = {x: 1, y: 2, z: 3};
+	  assert(typecast.object(obj) === obj);
+	  assert(typecast.object(1) instanceof Object);
+	  assert(Object.entries(typecast.object('{"x": 1, "y": 2, "z": 3}')).length == 3);
+	  assert(typecast.object('{"x": 1, "y": 2, "z": 3}').z === 3);
+  })
+  
+  it('should preserve non-string objects', function () {
+	  var now = new Date();
+	  assert(typeof typecast.object(now) === 'object');
+	  assert(Object.entries(typecast.object(now)).length == 0);
+	  assert(typeof typecast.object(now).getTime === 'function');
+  });
+  
+  it('should return an empty object when given a null-ish value', function () {
+	  assert(typeof typecast.object(null) == 'object');
+	  assert(Object.entries(typecast.object(null)).length == 0);
+  
+	  assert(typeof typecast.object(undefined) == 'object');
+	  assert(Object.entries(typecast.object(undefined)).length == 0);
+  })
+  
+  it('should return parsed JSON object when given valid JSON', function () {
+    const validJSON = '{"x": 1, "y": 2, "z": 3}'
+    assert(typeof typecast.object(validJSON) == 'object');
+    assert(Object.entries(typecast.object(validJSON)).length == 3);
+	  assert(typecast.object(validJSON).z === 3);
+  })
+  
+  it('should return value as property when given non-JSON string or other primitive', function () {
+    const invalidJSON = 'x: 1, y: 2, z: 3'
+    assert(typeof typecast.object(invalidJSON) == 'object');
+    assert(Object.entries(typecast.object(invalidJSON)).length == 1);
+	  assert(typecast.object(invalidJSON).value === 'x: 1, y: 2, z: 3');
+	  assert(typecast.object(1).value === 1);
   })
 })
 
